@@ -11,7 +11,22 @@ describe('resource extract', () => {
   // Prism tests are disabled
   test.skip('json: only required params', async () => {
     const responsePromise = client.extract.json({
-      json_schema: {},
+      json_schema: {
+        properties: {
+          stories: {
+            items: {
+              properties: {
+                author: { description: 'Author username', type: 'string' },
+                points: { description: 'Story points', type: 'number' },
+                title: { description: 'Story title', type: 'string' },
+              },
+              type: 'object',
+            },
+            type: 'array',
+          },
+        },
+        type: 'object',
+      },
       url: 'https://news.ycombinator.com',
     });
     const rawResponse = await responsePromise.asResponse();
@@ -26,8 +41,24 @@ describe('resource extract', () => {
   // Prism tests are disabled
   test.skip('json: required and optional params', async () => {
     const response = await client.extract.json({
-      json_schema: {},
+      json_schema: {
+        properties: {
+          stories: {
+            items: {
+              properties: {
+                author: { description: 'Author username', type: 'string' },
+                points: { description: 'Story points', type: 'number' },
+                title: { description: 'Story title', type: 'string' },
+              },
+              type: 'object',
+            },
+            type: 'array',
+          },
+        },
+        type: 'object',
+      },
       url: 'https://news.ycombinator.com',
+      geo_target: { country: 'US' },
       nocache: false,
     });
   });
@@ -48,6 +79,7 @@ describe('resource extract', () => {
   test.skip('markdown: required and optional params', async () => {
     const response = await client.extract.markdown({
       url: 'https://example.com/blog/article',
+      geo_target: { country: 'US' },
       metadata: true,
       nocache: false,
     });

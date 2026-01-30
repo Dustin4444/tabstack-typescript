@@ -11,7 +11,31 @@ export class Extract extends APIResource {
    * @example
    * ```ts
    * const response = await client.extract.json({
-   *   json_schema: {},
+   *   json_schema: {
+   *     properties: {
+   *       stories: {
+   *         items: {
+   *           properties: {
+   *             author: {
+   *               description: 'Author username',
+   *               type: 'string',
+   *             },
+   *             points: {
+   *               description: 'Story points',
+   *               type: 'number',
+   *             },
+   *             title: {
+   *               description: 'Story title',
+   *               type: 'string',
+   *             },
+   *           },
+   *           type: 'object',
+   *         },
+   *         type: 'array',
+   *       },
+   *     },
+   *     type: 'object',
+   *   },
    *   url: 'https://news.ycombinator.com',
    * });
    * ```
@@ -66,6 +90,16 @@ export namespace ExtractMarkdownResponse {
     author?: string;
 
     /**
+     * Document creation date (ISO 8601)
+     */
+    created_at?: string;
+
+    /**
+     * Creator application (e.g., "Microsoft Word")
+     */
+    creator?: string;
+
+    /**
      * Page description from Open Graph or HTML
      */
     description?: string;
@@ -76,6 +110,31 @@ export namespace ExtractMarkdownResponse {
     image?: string;
 
     /**
+     * PDF keywords as array
+     */
+    keywords?: Array<string>;
+
+    /**
+     * Document modification date (ISO 8601)
+     */
+    modified_at?: string;
+
+    /**
+     * Number of pages (PDF documents)
+     */
+    page_count?: number;
+
+    /**
+     * PDF version (e.g., "1.5")
+     */
+    pdf_version?: string;
+
+    /**
+     * PDF producer software (e.g., "Adobe PDF Library")
+     */
+    producer?: string;
+
+    /**
      * Publisher information from Open Graph
      */
     publisher?: string;
@@ -84,6 +143,12 @@ export namespace ExtractMarkdownResponse {
      * Site name from Open Graph
      */
     site_name?: string;
+
+    /**
+     * PDF-specific metadata fields (populated for PDF documents) PDF subject or
+     * summary
+     */
+    subject?: string;
 
     /**
      * Page title from Open Graph or HTML
@@ -114,9 +179,27 @@ export interface ExtractJsonParams {
   url: string;
 
   /**
+   * Optional geotargeting parameters for proxy requests
+   */
+  geo_target?: ExtractJsonParams.GeoTarget;
+
+  /**
    * Bypass cache and force fresh data retrieval
    */
   nocache?: boolean;
+}
+
+export namespace ExtractJsonParams {
+  /**
+   * Optional geotargeting parameters for proxy requests
+   */
+  export interface GeoTarget {
+    /**
+     * Country code using ISO 3166-1 alpha-2 standard (2 letters, e.g., "US", "GB",
+     * "JP"). See: https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2
+     */
+    country?: string;
+  }
 }
 
 export interface ExtractMarkdownParams {
@@ -124,6 +207,11 @@ export interface ExtractMarkdownParams {
    * URL to fetch and convert to markdown
    */
   url: string;
+
+  /**
+   * Optional geotargeting parameters for proxy requests
+   */
+  geo_target?: ExtractMarkdownParams.GeoTarget;
 
   /**
    * Include extracted metadata (Open Graph and HTML metadata) as a separate field in
@@ -135,6 +223,19 @@ export interface ExtractMarkdownParams {
    * Bypass cache and force fresh data retrieval
    */
   nocache?: boolean;
+}
+
+export namespace ExtractMarkdownParams {
+  /**
+   * Optional geotargeting parameters for proxy requests
+   */
+  export interface GeoTarget {
+    /**
+     * Country code using ISO 3166-1 alpha-2 standard (2 letters, e.g., "US", "GB",
+     * "JP"). See: https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2
+     */
+    country?: string;
+  }
 }
 
 export declare namespace Extract {

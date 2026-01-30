@@ -27,10 +27,35 @@ describe('resource agent', () => {
     const response = await client.agent.automate({
       task: 'Find the top 3 trending repositories and extract their names, descriptions, and star counts',
       data: {},
+      geo_target: { country: 'US' },
       guardrails: "browse and extract only, don't interact with repositories",
       maxIterations: 50,
       maxValidationAttempts: 3,
       url: 'https://github.com/trending',
+    });
+  });
+
+  // Prism doesn't support text/event-stream responses
+  test.skip('research: only required params', async () => {
+    const responsePromise = client.agent.research({
+      query: 'What are the latest developments in quantum computing?',
+    });
+    const rawResponse = await responsePromise.asResponse();
+    expect(rawResponse).toBeInstanceOf(Response);
+    const response = await responsePromise;
+    expect(response).not.toBeInstanceOf(Response);
+    const dataAndResponse = await responsePromise.withResponse();
+    expect(dataAndResponse.data).toBe(response);
+    expect(dataAndResponse.response).toBe(rawResponse);
+  });
+
+  // Prism doesn't support text/event-stream responses
+  test.skip('research: required and optional params', async () => {
+    const response = await client.agent.research({
+      query: 'What are the latest developments in quantum computing?',
+      fetch_timeout: 30,
+      mode: 'balanced',
+      nocache: false,
     });
   });
 });
