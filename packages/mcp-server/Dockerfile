@@ -3,10 +3,10 @@
 # This Dockerfile builds a Docker image for the MCP Server.
 #
 # To build the image locally:
-#   docker build -f packages/mcp-server/Dockerfile -t tabstack-mcp:local .
+#   docker build -f packages/mcp-server/Dockerfile -t @tabstack/mcp:local .
 #
 # To run the image:
-#   docker run -i tabstack-mcp:local [OPTIONS]
+#   docker run -i @tabstack/mcp:local [OPTIONS]
 #
 # Common options:
 #   --tool=<name>              Include specific tools
@@ -16,16 +16,17 @@
 #   --transport=<type>         Set transport type (stdio or http)
 #
 # For a full list of options:
-#   docker run -i tabstack-mcp:local --help
+#   docker run -i @tabstack/mcp:local --help
 #
 # Note: The MCP server uses stdio transport by default. Docker's -i flag
 # enables interactive mode, allowing the container to communicate over stdin/stdout.
 
 # Build stage
-FROM node:20-alpine AS builder
+FROM node:24-alpine AS builder
 
 # Enable corepack to use pnpm
 RUN corepack enable && corepack prepare pnpm@latest --activate
+
 # Install bash for build script
 RUN apk add --no-cache bash openssl
 
@@ -35,12 +36,15 @@ WORKDIR /build
 # Copy entire repository
 COPY . .
 
+# Set CI environment variable so pnpm install runs without prompts
+ENV CI=true
+
 # Install all dependencies and build everything
 RUN pnpm install --frozen-lockfile && \
     pnpm build
 
 # Production stage
-FROM node:20-alpine
+FROM node:24-alpine
 
 # Add non-root user
 RUN addgroup -g 1001 -S nodejs && adduser -S nodejs -u 1001

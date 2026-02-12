@@ -1,6 +1,6 @@
 {
   "name": "@tabstack/sdk",
-  "version": "2.1.0",
+  "version": "2.2.0",
   "description": "The official TypeScript library for the Tabstack API",
   "author": "Tabstack <>",
   "types": "dist/index.d.ts",
@@ -8,7 +8,7 @@
   "type": "commonjs",
   "repository": "github:Mozilla-Ocho/tabstack-typescript",
   "license": "Apache-2.0",
-  "packageManager": "pnpm@10.24.0",
+  "packageManager": "pnpm@10.27.0",
   "files": [
     "**/*"
   ],
