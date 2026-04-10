@@ -29,10 +29,23 @@ describe('resource agent', () => {
       data: {},
       geo_target: { country: 'US' },
       guardrails: "browse and extract only, don't interact with repositories",
+      interactive: false,
       maxIterations: 50,
       maxValidationAttempts: 3,
       url: 'https://github.com/trending',
     });
+  });
+
+  // Mock server tests are disabled
+  test.skip('automateInput', async () => {
+    const responsePromise = client.agent.automateInput('requestID', {});
+    const rawResponse = await responsePromise.asResponse();
+    expect(rawResponse).toBeInstanceOf(Response);
+    const response = await responsePromise;
+    expect(response).not.toBeInstanceOf(Response);
+    const dataAndResponse = await responsePromise.withResponse();
+    expect(dataAndResponse.data).toBe(response);
+    expect(dataAndResponse.response).toBe(rawResponse);
   });
 
   // Mock server tests are disabled
