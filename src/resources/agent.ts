@@ -141,6 +141,9 @@ export type AutomateEvent =
   | AutomateEvent.V1AutomateEventBrowserScreenshotCapturedImage
   | AutomateEvent.V1AutomateEventCdpEndpointConnected
   | AutomateEvent.V1AutomateEventCdpEndpointCycle
+  | AutomateEvent.V1AutomateEventComplete
+  | AutomateEvent.V1AutomateEventDone
+  | AutomateEvent.V1AutomateEventError
   | AutomateEvent.V1AutomateEventInteractiveFormDataError
   | AutomateEvent.V1AutomateEventInteractiveFormDataRequest
   | AutomateEvent.V1AutomateEventSystemDebugCompression
@@ -2102,6 +2105,140 @@ export namespace AutomateEvent {
   }
 
   /**
+   * Envelope for the "complete" event from /v1/automate.
+   */
+  export interface V1AutomateEventComplete {
+    /**
+     * Payload for the `complete` stream event. Structurally identical to
+     * TaskExecutionResult from webAgent.ts — the `complete` event's data is the
+     * agent's final TaskExecutionResult, stringified onto the SSE stream.
+     */
+    data: V1AutomateEventComplete.Data;
+
+    event: 'complete';
+  }
+
+  export namespace V1AutomateEventComplete {
+    /**
+     * Payload for the `complete` stream event. Structurally identical to
+     * TaskExecutionResult from webAgent.ts — the `complete` event's data is the
+     * agent's final TaskExecutionResult, stringified onto the SSE stream.
+     */
+    export interface Data {
+      /**
+       * Final answer or result from the agent
+       */
+      finalAnswer: string | null;
+
+      /**
+       * Execution statistics
+       */
+      stats: Data.Stats;
+
+      /**
+       * Whether the task completed successfully
+       */
+      success: boolean;
+
+      /**
+       * Structured error information for failed tasks
+       */
+      error?: Data.Error;
+    }
+
+    export namespace Data {
+      /**
+       * Execution statistics
+       */
+      export interface Stats {
+        actions: number;
+
+        durationMs: number;
+
+        endTime: number;
+
+        iterations: number;
+
+        startTime: number;
+      }
+
+      /**
+       * Structured error information for failed tasks
+       */
+      export interface Error {
+        /**
+         * Error codes for task failures
+         */
+        code: 'TASK_ABORTED' | 'MAX_ITERATIONS' | 'MAX_ERRORS' | 'TASK_FAILED';
+
+        /**
+         * Human-readable error message
+         */
+        message: string;
+      }
+    }
+  }
+
+  /**
+   * Envelope for the "done" event from /v1/automate.
+   */
+  export interface V1AutomateEventDone {
+    /**
+     * Payload for the `done` stream terminator event. Empty today; reserved for future
+     * metadata.
+     */
+    data: { [key: string]: unknown };
+
+    event: 'done';
+  }
+
+  /**
+   * Envelope for the "error" event from /v1/automate.
+   */
+  export interface V1AutomateEventError {
+    /**
+     * Payload for the top-level `error` stream event. Emitted when an uncaught error
+     * escapes the task runner. Mirrors `ErrorResponse` from the server package's
+     * `taskRunner.ts` — kept structurally aligned so schema and runtime stay
+     * consistent. Distinct from agent-level error events like `ai:generation:error`
+     * and `task:validation_error`, which are emitted through the normal event emitter
+     * during the agent loop.
+     */
+    data: V1AutomateEventError.Data;
+
+    event: 'error';
+  }
+
+  export namespace V1AutomateEventError {
+    /**
+     * Payload for the top-level `error` stream event. Emitted when an uncaught error
+     * escapes the task runner. Mirrors `ErrorResponse` from the server package's
+     * `taskRunner.ts` — kept structurally aligned so schema and runtime stay
+     * consistent. Distinct from agent-level error events like `ai:generation:error`
+     * and `task:validation_error`, which are emitted through the normal event emitter
+     * during the agent loop.
+     */
+    export interface Data {
+      error: Data.Error;
+
+      success: false;
+    }
+
+    export namespace Data {
+      export interface Error {
+        code: string;
+
+        message: string;
+
+        /**
+         * ISO-8601 timestamp
+         */
+        timestamp: string;
+      }
+    }
+  }
+
+  /**
    * Envelope for the "interactive:form_data:error" event from /v1/automate.
    */
   export interface V1AutomateEventInteractiveFormDataError {
@@ -3681,7 +3818,7 @@ export namespace AgentAutomateInputParams {
 
 export interface AgentResearchParams {
   /**
-   * The research query or question to answer
+   * The research query or question to answer. Maximum 10,000 characters.
    */
   query: string;
 
