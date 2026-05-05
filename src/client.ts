@@ -25,6 +25,8 @@ import {
   AgentResearchParams,
   AutomateEvent,
   ResearchEvent,
+  V1GlobalBuffer,
+  V1ResearchQuestionAssessment,
 } from './resources/agent';
 import {
   Extract,
@@ -183,6 +185,18 @@ export class Tabstack {
     this.maxRetries = options.maxRetries ?? 2;
     this.fetch = options.fetch ?? Shims.getDefaultFetch();
     this.#encoder = Opts.FallbackEncoder;
+
+    const customHeadersEnv = readEnv('TABSTACK_CUSTOM_HEADERS');
+    if (customHeadersEnv) {
+      const parsed: Record<string, string> = {};
+      for (const line of customHeadersEnv.split('\n')) {
+        const colon = line.indexOf(':');
+        if (colon >= 0) {
+          parsed[line.substring(0, colon).trim()] = line.substring(colon + 1).trim();
+        }
+      }
+      options.defaultHeaders = { ...parsed, ...options.defaultHeaders };
+    }
 
     this._options = options;
 
@@ -750,6 +764,8 @@ export declare namespace Tabstack {
     Agent as Agent,
     type AutomateEvent as AutomateEvent,
     type ResearchEvent as ResearchEvent,
+    type V1GlobalBuffer as V1GlobalBuffer,
+    type V1ResearchQuestionAssessment as V1ResearchQuestionAssessment,
     type AgentAutomateInputResponse as AgentAutomateInputResponse,
     type AgentAutomateParams as AgentAutomateParams,
     type AgentAutomateInputParams as AgentAutomateInputParams,
@@ -769,4 +785,6 @@ export declare namespace Tabstack {
     type GenerateJsonResponse as GenerateJsonResponse,
     type GenerateJsonParams as GenerateJsonParams,
   };
+
+  export type GeotargetGeoTarget = API.GeotargetGeoTarget;
 }
