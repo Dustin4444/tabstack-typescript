@@ -114,6 +114,12 @@ export namespace ExtractMarkdownResponse {
     description?: string;
 
     /**
+     * Favicon URL (resolved to absolute) parsed from <link rel="icon"> / "shortcut
+     * icon" / "apple-touch-icon"
+     */
+    favicon?: string;
+
+    /**
      * Featured image URL from Open Graph
      */
     image?: string;
@@ -178,7 +184,9 @@ export namespace ExtractMarkdownResponse {
 
 export interface ExtractJsonParams {
   /**
-   * JSON schema definition that describes the structure of data to extract.
+   * JSON schema definition that describes the structure of data to extract. If the
+   * schema includes a "page_title" or "favicon" property, those fields are
+   * automatically filled from page metadata when the AI leaves them empty.
    */
   json_schema: unknown;
 
@@ -210,6 +218,12 @@ export interface ExtractMarkdownParams {
    * URL to fetch and convert to markdown
    */
   url: string;
+
+  /**
+   * Content scope. "main" (default) returns the main article content; "full" returns
+   * the whole page, including navigation, footer, and links.
+   */
+  content?: 'main' | 'full';
 
   /**
    * Fetch effort level controlling speed vs. capability tradeoff. "min": fastest, no
